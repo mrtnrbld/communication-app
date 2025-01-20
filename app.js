@@ -16,7 +16,10 @@ const port = 3000;
 //     socket.emit('chat-message','Hello World')
 // })
 
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Middleware
+
 app.engine('ejs', engine);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));

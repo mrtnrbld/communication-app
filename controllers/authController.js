@@ -11,6 +11,7 @@ class AuthController {
         
         if (user) {
             req.session.user = username;
+            res.cookie('username', req.session.user, { httpOnly: false, sameSite: 'strict' }); // httpOnly prevents client-side JS access
             res.redirect('/chat');
         } else {
             res.render('login', { error: 'Invalid username or password' });
