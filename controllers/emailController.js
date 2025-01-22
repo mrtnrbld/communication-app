@@ -39,6 +39,24 @@ class EmailController {
     static async getEmails(req, res) {
         try {
             const emails = await Email.getEmails(req.session.user);
+            //res.json(emails);
+
+            const formattedEmails = emails.map(email => ({
+                id: email.id,
+                headers: email.headers,
+                text: email.text,  // Plain text content
+                html: email.html,  // HTML content
+                attachments: email.attachments?.map(attachment => ({
+                    id: attachment.id,
+                    filename: attachment.filename,
+                    size: attachment.size,
+                    mimetype: attachment.mimetype
+                })) || []
+                
+            }));
+            // emails.map(email =>{
+            //     console.log(email.attachments)
+            // })
             res.json(emails);
         } catch (error) {
             res.status(500).json({ error: error.message });

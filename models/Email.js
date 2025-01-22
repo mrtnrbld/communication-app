@@ -26,72 +26,89 @@ class Email {
         return new Promise((resolve, reject) => {
             const imap = new Imap(this.imapConfig);
             const emails = [];
-
+    
             imap.once('ready', () => {
                 imap.openBox('INBOX', false, (err, box) => {
                     if (err) reject(err);
+                    
                     const today = new Date();
-                    const searchCriteria = [['SINCE', today], 'UNSEEN']; // Combine UNSEEN and SINCE
-
-                    imap.seq.search(searchCriteria, (err, results) => {
-                        if (err) {
-                            return reject(err);
-                        }
-                        if (results.length === 0) { // Handle case where no unread emails are found
+                    const searchCriteria = [['SINCE', today]]; // Modify criteria if needed (e.g., ['UNSEEN'])
+                    const fetchOptions = {
+                        bodies: '', // Fetch the entire email
+                        struct: true, // Fetch email structure for attachments
+                    };
+    
+                    imap.search(searchCriteria, (err, results) => {
+                        if (err) return reject(err);
+    
+                        if (!results || results.length === 0) {
                             imap.end();
-                            return resolve([]);
+                            return resolve([]); // No emails found
                         }
-
-                        const fetch = imap.seq.fetch(results, { // Fetch the found emails
-                            bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)', 'TEXT'],
-                            struct: true
-                        });
-
+    
+                        const fetch = imap.fetch(results, fetchOptions);
+    
                         fetch.on('message', (msg, seqno) => {
-                            console.log("getting email");
                             const email = {};
-
+    
                             msg.on('body', (stream, info) => {
-                                if (info.which === 'TEXT') {
-                                    simpleParser(stream, (err, parsed) => {
-                                        if (err) return;
-                                        email.text = parsed.text;
-                                    });
-                                } else {
-                                    stream.on('data', (chunk) => {
-                                        email.headers = Imap.parseHeader(chunk.toString('utf8'));
-                                    });
-                                }
-                            });
+                                simpleParser(stream, (err, parsed) => {
+                                    if (err) {
+                                        console.error('Error parsing email:', err);
+                                        return;
+                                    }
+    
+                                    email.headers = {
+                                        from: parsed.from ? parsed.from.text : 'Unknown Sender',
+                                        to: parsed.to ? parsed.to.text : 'Unknown Recipient',
+                                        subject: parsed.subject || 'No Subject',
+                                        date: parsed.date ? parsed.date.toISOString() : 'Unknown Date',
+                                    };
+    
+                                    email.text = parsed.text || null;
+                                    email.html = parsed.html || null;
+    
+                                    // Process attachments
+                                    email.attachments = (parsed.attachments || []).map((attachment) => ({
+                                        filename: attachment.filename || 'Unnamed Attachment',
+                                        contentType: attachment.contentType || 'application/octet-stream',
+                                        size: attachment.size || 0,
+                                        content: attachment.content.toString('base64'), // Convert to Base64 for storage
+                                    }));
 
-                            msg.once('attributes', (attrs) => {
-                                email.attributes = attrs;
+                                    // Push email only after parsing is done
+                                    emails.push(email);
+                                });
                             });
-
+    
                             msg.once('end', () => {
-                                emails.push(email);
+                                // No need to do anything here as the email is already added
                             });
                         });
-
+    
                         fetch.once('error', (err) => {
+                            console.error('Fetch error:', err);
                             reject(err);
                         });
-
+    
                         fetch.once('end', () => {
                             imap.end();
-                            resolve(emails);
+                            resolve(emails); // Resolve the emails array when done fetching
                         });
                     });
                 });
             });
-
+    
             imap.once('error', (err) => {
+                console.error('IMAP connection error:', err);
                 reject(err);
             });
-
+    
             imap.connect();
         });
     }
+    
+    
 
     async sendEmail(from, to, subject, text, attachments = []) {
         try {

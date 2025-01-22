@@ -1,295 +1,453 @@
 <% layout('layout') -%>
-<div class="email-container">
-    <div class="email-sidebar">
-        <button id="composeBtn" class="compose-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            Compose
-        </button>
-        
-        <div class="email-folders">
-            <div class="folder active">Inbox</div>
-            <div class="folder">Sent</div>
-            <div class="folder">Drafts</div>
-            <div class="folder">Trash</div>
-        </div>
-    </div>
+    <div class="email-container">
+        <div class="email-sidebar">
+            <button id="composeBtn" class="compose-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Compose
+            </button>
 
-    <div class="email-content">
-        <div class="email-list">
-            <% if (emails && emails.length > 0) { %>
-                <% emails.forEach(email => { %>
-                    <div class="email-item">
-                        <div class="email-sender"><%= email.headers.from %></div>
-                        <div class="email-subject"><%= email.headers.subject %></div>
-                        <div class="email-date"><%= new Date(email.headers.date).toLocaleDateString() %></div>
-                    </div>
-                <% }); %>
-            <% } else { %>
-                <div class="no-emails">No emails to display</div>
-            <% } %>
-        </div>
-    </div>
-
-    <!-- Compose Modal -->
-    <div id="composeModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>New Message</h3>
-                <button class="close-btn">&times;</button>
+            <div class="email-folders">
+                <div class="folder active">Inbox</div>
+                <div class="folder">Sent</div>
+                <div class="folder">Drafts</div>
+                <div class="folder">Trash</div>
             </div>
-            <form id="emailForm">
-                <div class="form-group">
-                    <input type="email" name="to" placeholder="To:" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" name="subject" placeholder="Subject:" required>
-                </div>
-                <div class="form-group">
-                    <textarea name="text" placeholder="Write your message here..." rows="10" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="attachment-label">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
-                        </svg>
-                        Attach files
-                        <input type="file" multiple name="attachments" style="display: none;">
-                    </label>
-                    <div id="attachmentList"></div>
-                </div>
-                <button type="submit" class="send-btn">Send</button>
-            </form>
         </div>
+
+        <div class="email-content">
+            <div class="email-list">
+                <% if (emails && emails.length> 0) { %>
+                    <% emails.forEach(function(email) { %>
+                        <div class="email-item">
+                            <div class="email-sender">
+                                <%= email.headers && email.headers.from ? email.headers.from : 'Unknown Sender' %>
+                            </div>
+                            <div class="email-subject">
+                                <%= email.headers && email.headers.subject ? email.headers.subject : 'No Subject' %>
+                            </div>
+                            <div class="email-date">
+                                <%= email.headers && email.headers.date ? email.headers.date : 'No Date' %>
+                            </div>
+                        </div>
+                        <% }); %>
+
+                            <% } else { %>
+                                <div class="no-emails">No emails to display</div>
+                                <% } %>
+            </div>
+        </div>
+
+        <!-- Compose Modal -->
+        <div id="composeModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>New Message</h3>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <form id="emailForm">
+                    <div class="form-group">
+                        <input type="email" name="to" placeholder="To:" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="subject" placeholder="Subject:" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea name="text" placeholder="Write your message here..." rows="10" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="attachment-label">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <path
+                                    d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48">
+                                </path>
+                            </svg>
+                            Attach files
+                            <input type="file" multiple name="attachments" style="display: none;">
+                        </label>
+                        <div id="attachmentList"></div>
+                    </div>
+                    <button type="submit" class="send-btn">Send</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="emailDetailModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Email Details</h3>
+                    <button class="close-detail-btn">&times;</button>
+                </div>
+                <div id="emailDetailContent">
+                    <div class="email-header">
+                        <p><strong>From:</strong> <span id="emailSender"></span></p>
+                        <p><strong>Subject:</strong> <span id="emailSubject"></span></p>
+                        <p><strong>Date:</strong> <span id="emailDate"></span></p>
+                    </div>
+                    <div class="email-body" id="emailBody"></div>
+                    <div id="attachmentSection" style="margin-top: 20px;">
+                        <h4>Attachments:</h4>
+                        <ul id="attachmentList2"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
-</div>
 
-<style>
-.email-container {
-    display: flex;
-    height: calc(100vh - 100px);
-    background: #f5f5f5;
-}
+    <style>
+        .email-container {
+            display: flex;
+            height: calc(100vh - 100px);
+            background: #f5f5f5;
+        }
 
-.email-sidebar {
-    width: 250px;
-    background: white;
-    padding: 20px;
-    border-right: 1px solid #ddd;
-}
+        .email-sidebar {
+            width: 250px;
+            background: white;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
 
-.compose-btn {
-    width: 100%;
-    padding: 10px;
-    background: #1a73e8;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    cursor: pointer;
-    margin-bottom: 20px;
-}
+        .compose-btn {
+            width: 100%;
+            padding: 10px;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
 
-.email-folders {
-    margin-top: 20px;
-}
+        .email-folders {
+            margin-top: 20px;
+        }
 
-.folder {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 4px;
-}
+        .folder {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
 
-.folder:hover {
-    background: #f1f3f4;
-}
+        .folder:hover {
+            background: #f1f3f4;
+        }
 
-.folder.active {
-    background: #e8f0fe;
-    color: #1a73e8;
-}
+        .folder.active {
+            background: #e8f0fe;
+            color: #1a73e8;
+        }
 
-.email-content {
-    flex-grow: 1;
-    padding: 20px;
-    overflow-y: auto;
-}
+        .email-content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
 
-.email-item {
-    background: white;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    display: grid;
-    grid-template-columns: 200px 1fr 100px;
-    gap: 20px;
-    cursor: pointer;
-}
+        .email-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            display: grid;
+            grid-template-columns: 200px 1fr 100px;
+            gap: 20px;
+            cursor: pointer;
+        }
 
-.email-item:hover {
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
+        .email-item:hover {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
 
-.modal {
-    position: fixed;
-    bottom: 0;
-    right: 30px;
-    width: 600px;
-    background: white;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    border-radius: 8px 8px 0 0;
-    z-index: 1000;
-}
+        .modal {
+            position: fixed;
+            bottom: 0;
+            right: 30px;
+            width: 600px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px 8px 0 0;
+            z-index: 1000;
+        }
 
-.modal-content {
-    padding: 20px;
-}
+        .modal-content {
+            padding: 20px;
+        }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-.close-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-}
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
 
-.form-group {
-    margin-bottom: 15px;
-}
+        .form-group {
+            margin-bottom: 15px;
+        }
 
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
 
-.attachment-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-}
+        .attachment-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
 
-.send-btn {
-    background: #1a73e8;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-}
+        .send-btn {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
 
-#attachmentList {
-    margin-top: 10px;
-}
+        #attachmentList {
+            margin-top: 10px;
+        }
 
-.attachment-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px;
-    background: #f1f3f4;
-    border-radius: 4px;
-    margin-top: 5px;
-}
-</style>
+        .attachment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            background: #f1f3f4;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const composeBtn = document.getElementById('composeBtn');
-    const composeModal = document.getElementById('composeModal');
-    const closeBtn = document.querySelector('.close-btn');
-    const emailForm = document.getElementById('emailForm');
-    const attachmentInput = document.querySelector('input[name="attachments"]');
-    const attachmentList = document.getElementById('attachmentList');
+        .email-body {
+            margin-top: 15px;
+            line-height: 1.6;
+            font-size: 14px;
+            color: #333;
+            white-space: pre-wrap;
+            /* Preserve spacing for plain text */
+        }
+    </style>
 
-    // Toggle compose modal
-    composeBtn.onclick = () => composeModal.style.display = 'block';
-    closeBtn.onclick = () => composeModal.style.display = 'none';
+    <script>
+        let emails= []
+        // Assuming you have the `emails` array with all email data
+        document.querySelectorAll('.email-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const emailId = this.dataset.emailId; // Get the email ID from data attribute
 
-    // Handle attachment selection
-    attachmentInput.onchange = function() {
-        attachmentList.innerHTML = '';
-        [...this.files].forEach(file => {
-            const div = document.createElement('div');
-            div.className = 'attachment-item';
-            div.innerHTML = `
+                // Find the email object by ID
+                const email = emails.find(email => email.id === emailId);
+
+                if (email) {
+                    // Populate the modal with email details
+                    document.getElementById('emailSender').innerText = email.headers.from || 'Unknown Sender';
+                    document.getElementById('emailSubject').innerText = email.headers.subject || 'No Subject';
+                    document.getElementById('emailDate').innerText = email.headers.date || 'Unknown Date';
+                    document.getElementById('emailBody').innerHTML = email.html || email.text || 'No content';
+
+                    // Get the attachment section and list
+                    const attachmentSection = document.getElementById('attachmentSection');
+                    const attachmentList = document.getElementById('attachmentList');
+
+                    // Clear previous attachments
+                    attachmentList.innerHTML = '';
+
+                    // If there are attachments, show them in the list
+                    if (email.attachments && email.attachments.length > 0) {
+                        email.attachments.forEach(attachment => {
+                            const listItem = document.createElement('li');
+                            listItem.innerHTML = `
+                        <strong>${attachment.filename}</strong><br>
+                        <a href="/email/attachment/${attachment.id}" download="${attachment.filename}">Download</a>
+                    `;
+                            attachmentList.appendChild(listItem);
+                        });
+
+                        // Show the attachment section
+                        attachmentSection.style.display = 'block';
+                    } else {
+                        // Hide the attachment section if no attachments
+                        attachmentSection.style.display = 'none';
+                    }
+
+                    // Display the modal
+                    document.getElementById('emailDetailModal').style.display = 'block';
+                }
+            });
+        });
+
+        // Close modal when clicking the close button
+        document.querySelector('.close-detail-btn').addEventListener('click', function () {
+            document.getElementById('emailDetailModal').style.display = 'none';
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const composeBtn = document.getElementById('composeBtn');
+            const composeModal = document.getElementById('composeModal');
+            const closeBtn = document.querySelector('.close-btn');
+            const emailForm = document.getElementById('emailForm');
+            const attachmentInput = document.querySelector('input[name="attachments"]');
+            const attachmentList = document.getElementById('attachmentList');
+            const emailDetailModal = document.getElementById('emailDetailModal');
+            const closeDetailBtn = document.querySelector('.close-detail-btn');
+            const emailSender = document.getElementById('emailSender');
+            const emailSubject = document.getElementById('emailSubject');
+            const emailDate = document.getElementById('emailDate');
+            const emailBody = document.getElementById('emailBody');
+
+            // Toggle compose modal
+            composeBtn.onclick = () => composeModal.style.display = 'block';
+            closeBtn.onclick = () => composeModal.style.display = 'none';
+
+            // Close email detail modal
+            closeDetailBtn.onclick = () => emailDetailModal.style.display = 'none';
+
+            // Handle attachment selection
+            attachmentInput.onchange = function () {
+                attachmentList.innerHTML = '';
+                [...this.files].forEach(file => {
+                    const div = document.createElement('div');
+                    div.className = 'attachment-item';
+                    div.innerHTML = `
                 <span>${file.name}</span>
                 <button type="button" onclick="this.parentElement.remove()">×</button>
             `;
-            attachmentList.appendChild(div);
-        });
-    };
+                    attachmentList.appendChild(div);
+                });
+            };
 
-    // Handle email form submission
-    emailForm.onsubmit = async function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
+            // Handle email form submission
+            emailForm.onsubmit = async function (e) {
+                e.preventDefault();
+                const formData = new FormData(this);
 
-        try {
-            const response = await fetch('/email/send', {
-                method: 'POST',
-                body: formData
-            });
+                try {
+                    const response = await fetch('/email/send', {
+                        method: 'POST',
+                        body: formData
+                    });
 
-            const result = await response.json();
-            
-            if (result.success) {
-                composeModal.style.display = 'none';
-                emailForm.reset();
-                attachmentList.innerHTML = '';
-                alert('Email sent successfully!');
-            } else {
-                alert(result.error || 'Failed to send email');
+                    const result = await response.json();
+
+                    if (result.success) {
+                        composeModal.style.display = 'none';
+                        emailForm.reset();
+                        attachmentList.innerHTML = '';
+                        alert('Email sent successfully!');
+                    } else {
+                        alert(result.error || 'Failed to send email');
+                    }
+                } catch (error) {
+                    alert('Error sending email');
+                }
+            };
+
+            // Fetch emails periodically
+            async function fetchEmails() {
+                try {
+                    const response = await fetch('/email/fetch');
+                    const emails = await response.json();
+                    updateEmailList(emails);
+                } catch (error) {
+                    console.error('Error fetching emails:', error);
+                }
             }
-        } catch (error) {
-            alert('Error sending email');
-        }
-    };
+            fetchEmails();
 
-    // Fetch emails periodically
-    async function fetchEmails() {
-        try {
-            const response = await fetch('/email/fetch');
-            const emails = await response.json();
-            updateEmailList(emails);
-        } catch (error) {
-            console.error('Error fetching emails:', error);
-        }
-    }
-
-    // Update email list
-    function updateEmailList(emails) {
-        const emailList = document.querySelector('.email-list');
-        if (emails.length > 0) {
-            emailList.innerHTML = emails.map(email => `
-                <div class="email-item">
+            // Update email list
+            function updateEmailList(emails) {
+                const emailList = document.querySelector('.email-list');
+                if (emails.length > 0) {
+                    emailList.innerHTML = emails.map((email, index) => `
+                <div class="email-item" data-index="${index}">
                     <div class="email-sender">${email.headers.from}</div>
                     <div class="email-subject">${email.headers.subject}</div>
                     <div class="email-date">${new Date(email.headers.date).toLocaleDateString()}</div>
                 </div>
             `).join('');
-        }
+
+                    // Attach click event listener to each email item
+                    document.querySelectorAll('.email-item').forEach((item, index) => {
+                        item.addEventListener('click', () => showEmailDetail(emails[index]));
+                    });
+                } else {
+                    emailList.innerHTML = '<div class="no-emails">No emails to display</div>';
+                }
+            }
+
+            // Show email detail
+            function showEmailDetail(email) {
+                emailSender.textContent = email.headers.from;
+                emailSubject.textContent = email.headers.subject;
+                emailDate.textContent = new Date(email.headers.date).toLocaleString();
+
+                // Display HTML or text content
+                if (email.html) {
+                    emailBody.innerHTML = email.html; // Render HTML content
+                } else if (email.text) {
+                    emailBody.textContent = email.text; // Render plain text content
+                } else {
+                    emailBody.textContent = 'No content available';
+                }
+
+                // Render attachments
+                const attachmentList = document.getElementById('attachmentList2');
+    
+    // Clear previous attachments
+    attachmentList.innerHTML = '';
+
+    // If there are attachments, render them
+    if (email.attachments && email.attachments.length > 0) {
+        email.attachments.forEach(attachment => {
+            const listItem = document.createElement('li');
+            const downloadLink = document.createElement('a');
+            
+            // Use the content as a data URL (assuming it's base64-encoded)
+            downloadLink.href = attachment.content;  // If base64-encoded, set href to content
+            downloadLink.download = attachment.filename;
+            downloadLink.textContent = `${attachment.filename} (${attachment.size} bytes)`;
+
+            listItem.appendChild(downloadLink);
+            attachmentList.appendChild(listItem);
+        });
+    } else {
+        attachmentList.innerHTML = '<li>No attachments</li>';
     }
 
-    // Fetch emails every minute
-    fetchEmails();
-    setInterval(fetchEmails, 60000);
-});
-</script>
+                emailDetailModal.style.display = 'block';
+            }
+
+
+
+
+            // Fetch emails every minute
+            fetchEmails();
+            setInterval(fetchEmails, 60000);
+        });
+
+    </script>
