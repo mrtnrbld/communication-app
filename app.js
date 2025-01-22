@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
@@ -10,16 +11,9 @@ const routes = require('./routes');
 const app = express();
 const port = 3000;
 
-// socket
-// const io = require('socket.io')(3000)
-// io.on('connection', socket => {
-//     socket.emit('chat-message','Hello World')
-// })
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Middleware
-
 app.engine('ejs', engine);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
