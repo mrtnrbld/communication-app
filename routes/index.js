@@ -5,6 +5,8 @@ const path = require('path');
 const AuthController = require('../controllers/authController');
 const ChatController = require('../controllers/chatController');
 const EmailController = require('../controllers/emailController');
+const SmsController = require('../controllers/smsController');
+const VoiceController = require('../controllers/voiceController')
 
 // Middleware to check if user is authenticated
 const requireAuth = (req, res, next) => {
@@ -71,6 +73,13 @@ router.get('/email/attachment/:id', async (req, res) => {
     }
 });
 
+// SMS routes
+router.get('/sms', requireAuth, SmsController.renderSMSPage);
+router.post('/sms/send', requireAuth, SmsController.sendSMS);
+
+// Voice routes
+router.post('/voice/call', requireAuth, VoiceController.makeCall);
+router.post('/voice/call-handler', requireAuth, VoiceController.handleCall);
 
 
 module.exports = router;

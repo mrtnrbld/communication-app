@@ -254,7 +254,7 @@
     </style>
 
     <script>
-        let emails= []
+        let emails = []
         // Assuming you have the `emails` array with all email data
         document.querySelectorAll('.email-item').forEach(item => {
             item.addEventListener('click', function () {
@@ -381,6 +381,7 @@
 
             // Update email list
             function updateEmailList(emails) {
+                console.log(emails)
                 const emailList = document.querySelector('.email-list');
                 if (emails.length > 0) {
                     emailList.innerHTML = emails.map((email, index) => `
@@ -417,27 +418,27 @@
 
                 // Render attachments
                 const attachmentList = document.getElementById('attachmentList2');
-    
-    // Clear previous attachments
-    attachmentList.innerHTML = '';
 
-    // If there are attachments, render them
-    if (email.attachments && email.attachments.length > 0) {
-        email.attachments.forEach(attachment => {
-            const listItem = document.createElement('li');
-            const downloadLink = document.createElement('a');
-            
-            // Use the content as a data URL (assuming it's base64-encoded)
-            downloadLink.href = attachment.content;  // If base64-encoded, set href to content
-            downloadLink.download = attachment.filename;
-            downloadLink.textContent = `${attachment.filename} (${attachment.size} bytes)`;
+                // Clear previous attachments
+                attachmentList.innerHTML = '';
 
-            listItem.appendChild(downloadLink);
-            attachmentList.appendChild(listItem);
-        });
-    } else {
-        attachmentList.innerHTML = '<li>No attachments</li>';
-    }
+                // If there are attachments, render them
+                if (email.attachments && email.attachments.length > 0) {
+                    email.attachments.forEach(attachment => {
+                        const listItem = document.createElement('li');
+                        const downloadLink = document.createElement('a');
+
+                        // Use the content as a data URL (assuming it's base64-encoded)
+                        downloadLink.href = attachment.content;  // If base64-encoded, set href to content
+                        downloadLink.download = attachment.filename;
+                        downloadLink.textContent = `${attachment.filename} (${attachment.size} bytes)`;
+
+                        listItem.appendChild(downloadLink);
+                        attachmentList.appendChild(listItem);
+                    });
+                } else {
+                    attachmentList.innerHTML = '<li>No attachments</li>';
+                }
 
                 emailDetailModal.style.display = 'block';
             }
@@ -446,8 +447,8 @@
 
 
             // Fetch emails every minute
-            fetchEmails();
-            setInterval(fetchEmails, 60000);
+            //fetchEmails();
+            //setInterval(fetchEmails, 60000);
         });
 
     </script>

@@ -40,7 +40,6 @@ class EmailController {
         try {
             const emails = await Email.getEmails(req.session.user);
             //res.json(emails);
-
             const formattedEmails = emails.map(email => ({
                 id: email.id,
                 headers: email.headers,

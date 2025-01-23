@@ -32,7 +32,11 @@ class Email {
                     if (err) reject(err);
                     
                     const today = new Date();
-                    const searchCriteria = [['SINCE', today]]; // Modify criteria if needed (e.g., ['UNSEEN'])
+                    today.setDate(today.getDate() - 1);
+                    const formattedToday = today.toUTCString();
+                    //console.log("Formatted Today's Date: ", formattedToday);
+
+                    const searchCriteria = [['SINCE', formattedToday]]; // Modify criteria if needed (e.g., ['UNSEEN'])
                     const fetchOptions = {
                         bodies: '', // Fetch the entire email
                         struct: true, // Fetch email structure for attachments

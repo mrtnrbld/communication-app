@@ -1,2 +1,115 @@
 <% layout('layout') -%>
-<div>Voice page content will go here</div>
+    <div class="dialer-container">
+        <h2>Dialer</h2>
+        <input type="text" id="phoneNumber" placeholder="Enter phone number" />
+        <div class="keypad">
+            <button>1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>4</button>
+            <button>5</button>
+            <button>6</button>
+            <button>7</button>
+            <button>8</button>
+            <button>9</button>
+            <button>*</button>
+            <button>0</button>
+            <button>#</button>
+        </div>
+        <button id="callButton" class="call-btn">Call</button>
+        <button id="endCallButton" class="call-btn" style="display: none;">End Call</button>
+    </div>
+
+    <style>
+        .dialer-container {
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .keypad button,
+        .call-btn {
+            padding: 15px;
+            font-size: 18px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .call-btn {
+            width: 100%;
+            background: #4caf50;
+            color: white;
+        }
+
+        .call-btn:hover {
+            background: #45a049;
+        }
+
+        .keypad button:hover {
+            background: #d6d6d6;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const phoneNumberInput = document.getElementById('phoneNumber');
+            const callButton = document.getElementById('callButton');
+            const endCallButton = document.getElementById('endCallButton');
+
+            // Dialer Keypad Logic
+            document.querySelectorAll('.keypad button').forEach(button => {
+                button.addEventListener('click', () => {
+                    phoneNumberInput.value += button.textContent;
+                });
+            });
+
+            // Call Button Click Handler
+            callButton.addEventListener('click', async () => {
+                const number = phoneNumberInput.value.trim();
+                console.log(JSON.stringify(number))
+                if (!number) {
+                    alert('Please enter a valid phone number.');
+                    return;
+                }
+                try {
+                    const response = await fetch(`/voice/call`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json', // Important: Tell the server you're sending JSON
+                        },
+                        body: JSON.stringify({ number }),
+                    });
+
+                    if (response.ok) {
+                        alert(`Calling ${number}...`);
+                        callButton.style.display = 'none';
+                        endCallButton.style.display = 'block';
+                    } else {
+                        alert('Failed to initiate call.');
+                    }
+                } catch (error) {
+                    console.error('Error initiating call:', error);
+                }
+            });
+
+            // End Call Button Click Handler
+            endCallButton.addEventListener('click', () => {
+                alert('Call ended.');
+                callButton.style.display = 'block';
+                endCallButton.style.display = 'none';
+            });
+        });
+    </script>
