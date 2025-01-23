@@ -18,6 +18,8 @@
         </div>
         <button id="callButton" class="call-btn">Call</button>
         <button id="endCallButton" class="call-btn" style="display: none;">End Call</button>
+        <button id="call-button" style="display:block;">Answer Call</button>
+        <button id="hangup-button" style="display:none;">Hang Up</button>
     </div>
 
     <style>
@@ -111,5 +113,66 @@
                 callButton.style.display = 'block';
                 endCallButton.style.display = 'none';
             });
+        });
+        let device;
+        document.addEventListener('click', () => {
+            if (Twilio && Twilio.Device) {
+                if (Twilio.Device.audio && Twilio.Device.audio.context && Twilio.Device.audio.context.state !== 'running') {
+                    Twilio.Device.audio.context.resume().then(() => {
+                        console.log('AudioContext resumed');
+                    });
+                }
+            }
+        });
+        fetch('/token', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.token) {
+                device = new Twilio.Device(data.token, {
+                    debug: true
+                });
+
+                device.setup(data.token);
+
+                device.on('ready', () => {
+                    console.log('Device is ready to receive calls');
+                    alert('device is receiving calls')
+                });
+
+                // device.on('incoming', (connection) => {
+                //     connection.accept();
+                //     console.log('Call accepted');
+                //     document.getElementById('hangup-button').style.display = 'block';
+                // });
+                device.on('incoming', (connection) => {
+                    console.log('Incoming call from:', connection.parameters.From);
+                    connection.accept();
+                    console.log('Call accepted');
+                    document.getElementById('hangup-button').style.display = 'block';
+                });
+
+                device.on('error', (error) => {
+                    console.error('Twilio Device Error:', error);
+                });
+
+                device.on('disconnect', (connection) => {
+                    console.log('Call disconnected');
+                    document.getElementById('hangup-button').style.display = 'none';
+                });
+            } else {
+                console.error('Failed to fetch token');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching token:', error);
+        });
+
+        document.getElementById('hangup-button').addEventListener('click', () => {
+            if (device) {
+                device.disconnectAll();
+                document.getElementById('hangup-button').style.display = 'none';
+            }
         });
     </script>

@@ -17,20 +17,6 @@ async function sendSMS(to, message) {
     }
 }
 
-// async function makeCall(number){
-//     try {
-//         await client.calls.create({
-//           url: 'http://demo.twilio.com/docs/voice.xml', // Replace with your TwiML app URL
-//           to: number,
-//           from: process.env.TWILIO_PHONE_NUMBER,
-//         });
-//         res.status(200).json({ message: 'Call initiated successfully.' });
-//       } catch (error) {
-//         console.error('Error initiating call:', error);
-//         //throw new Error(`Failed to send SMS: ${error.message}`);
-//         res.status(500).json({ error: 'Failed to initiate call.' });
-//       }
-// }
 async function makeCall(number) {
     try {
         const call = await client.calls.create({
@@ -39,6 +25,7 @@ async function makeCall(number) {
             from: process.env.TWILIO_PHONE_NUMBER,
         });
         console.log('Call initiated:', call.sid);
+        console.log(call.sid)
         return call; // Return the call object
     } catch (error) {
         console.error('Error initiating call:', error);

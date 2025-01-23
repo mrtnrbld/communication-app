@@ -1,4 +1,4 @@
-const socket = io('http://localhost:5500');
+const socket = io('https://d0ec-112-211-58-173.ngrok-free.app/');
 const messageContainer = document.getElementById('chatMessages');
 const messageForm = document.getElementById('chatForm');
 const messageInput = document.getElementById('messageInput');
@@ -26,7 +26,7 @@ socket.on('chat-message', data => {
 });
 
 socket.on('user-connected', username => {
-    appendMessage('',`${username} connected`,null);
+    appendMessage('', `${username} connected`, null);
 });
 
 socket.on('error', message => {
@@ -35,7 +35,7 @@ socket.on('error', message => {
     errorElement.className = 'error-message';
     errorElement.innerText = message;
     messageContainer.append(errorElement);
-    
+
     // Remove error message after 5 seconds
     setTimeout(() => {
         errorElement.remove();
@@ -45,7 +45,7 @@ socket.on('error', message => {
 
 
 // Handle file selection
-attachmentInput.addEventListener('change', function() {
+attachmentInput.addEventListener('change', function () {
     attachmentPreview.innerHTML = '';
     [...this.files].forEach(file => {
         const fileDiv = document.createElement('div');
@@ -69,13 +69,13 @@ messageForm?.addEventListener('submit', async (e) => {
         for (const file of files) {
             // Convert file to base64
             const reader = new FileReader();
-            reader.onload = function() {
+            reader.onload = function () {
                 const attachment = {
                     name: file.name,
                     type: file.type,
                     data: reader.result
                 };
-                
+
                 // Emit message with attachment
                 socket.emit('send-chat-message', {
                     message: message,
@@ -103,7 +103,7 @@ messageForm?.addEventListener('submit', async (e) => {
 function appendMessage(prefix, message, attachment = null) {
     const messageElement = document.createElement('div');
     messageElement.className = 'message';
-    
+
     if (attachment) {
         messageElement.innerHTML = `
             <div>${prefix}${message}</div>
@@ -112,7 +112,7 @@ function appendMessage(prefix, message, attachment = null) {
     } else {
         messageElement.innerText = `${prefix}${message}`;
     }
-    
+
     messageContainer.append(messageElement);
     messageContainer.scrollTop = messageContainer.scrollHeight;
 }
@@ -133,3 +133,6 @@ function getAttachmentHTML(attachment) {
         `;
     }
 }
+
+//const socket = io();
+// Handle incoming call
